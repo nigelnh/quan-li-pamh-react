@@ -1,38 +1,496 @@
-.App {
-  text-align: center;
+body {
+  font-family: Roboto, Arial;
+  background-color: #e5e4e2;
+  margin: 0;
+  padding: 0;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.thanh-trang-thai {
+  color: #a9a9a9;
+  background-color: black;
+  height: 50px;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.thanh-trang-thai div {
+  font-size: 15px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.thanh-trang-thai .eProcurement {
+  margin-left: 10px;
+  margin-right: 0;
+  color: white;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.thanh-trang-thai .split-icon {
+  margin-left: 10px;
+}
+
+.thanh-trang-thai .thong-bao {
+  margin-left: auto;
+  width: 150px;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.thanh-trang-thai .nav {
+  display: flex;
+  justify-content: space-between;
+  margin-left: 25px;
+  align-items: center;
+  height: 48px;
+}
+
+.thanh-trang-thai .nav:hover {
+  cursor: pointer;
+  border-bottom: 3px solid #0080ff;
+}
+
+.tong-quan-container {
+  display: flex;
+}
+
+.tong-quan {
+  font-size: 15px;
+  color: #0080ff;
+  text-decoration: underline;
+
+  padding-left: 10px;
+  padding-top: 10px;
+  margin-left: 20px;
+}
+
+.tong-quan-gach {
+  font-size: 15px;
+  color: #0080ff;
+
+  padding: 10px;
+}
+
+.noi-dung {
+  font-size: 30px;
+  font-weight: 500;
+  padding: 10px;
+  padding-top: 0;
+  margin-left: 20px;
+}
+
+.container {
+  height: 250px;
+  margin-left: 15px;
+  margin-right: 15px;
+
+  display: flex;
+}
+
+.container .hang-hoa-can-mua {
+  background-color: white;
+  width: 935px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  height: 214px;
+}
+
+.container .to-do {
+  width: 12px;
+  height: 14px;
+  margin-right: 10px;
+}
+
+.container .de-nghi-mua {
+  background-color: white;
+  margin-left: auto;
+  width: 525px;
+  height: 213px;
+  padding: 10px;
+}
+
+.container .tua-de {
+  font-size: 19px;
+  margin-bottom: 3px;
+  margin-left: 10px;
+}
+
+.container .tua-de-des {
+  font-size: 14px;
+  color: #a9a9a9;
+  margin-bottom: 10px;
+  margin-left: 10px;
+}
+
+.container .hang-hoa-can-mua input {
+  width: 895px;
+  padding: 10px;
+  border: none;
+  background-color: #e5e4e2;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.container .de-nghi-mua input {
+  width: 505px;
+  padding: 10px;
+  border: none;
+  background-color: #e5e4e2;
+  margin-right: 10px;
+}
+
+.container .thong-tin {
+  display: flex;
+}
+
+.container .loai-hang-hoa {
+  width: 580px;
+}
+
+.container .hang-hoa {
+  width: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 12px;
+  margin-bottom: 6px;
+  margin-top: 6px;
+  padding-left: 10px;
+  padding-bottom: 2px;
+
+  border-bottom: 1px solid #e5e4e2;
+}
+
+.container .doc-add {
+  margin-left: auto;
+  width: 12px;
+  height: 14px;
+}
+
+.loai {
+  font-weight: bold;
+}
+
+.container .vat-tu-hang-hoa {
+  margin-left: 10px;
+}
+
+.container .so-luong {
+  width: 500px;
+}
+
+.container .de-nghi-mua .loai-hang-hoa {
+  width: 250px;
+}
+
+.container .num {
+  color: #0080ff;
+}
+
+.plan {
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+.plan .tua-de-container {
+  background-color: white;
+  height: auto;
+  /* padding-bottom: 10px; */
+
   display: flex;
   flex-direction: column;
+}
+
+.plan .tua-de {
+  font-size: 19px;
+  margin-bottom: 3px;
+  padding-top: 10px;
+  padding-left: 10px;
+}
+
+.plan .tua-de-des {
+  font-size: 14px;
+  color: #a9a9a9;
+  margin-bottom: 10px;
+  padding-left: 10px;
+}
+
+.plan .view {
+  color: #0080ff;
+  font-size: 14px;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  padding-left: 10px;
+}
+
+.plan .view-sym {
+  width: 15px;
+  margin-right: 5px;
+}
+
+.plan .view-des {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+
+  align-items: center;
+}
+
+.plan .right-setting {
+  height: fit-content;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 225px;
+}
+
+.plan .tao-pam {
+  background-color: #0080ff;
   color: white;
+  font-size: 14px;
+  padding: 12px;
 }
 
-.App-link {
-  color: #61dafb;
+.plan .tao-pam:hover {
+  cursor: pointer;
+  background-color: #0048ff;
+  transition: ease-in 0.2s;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.plan .add-sym {
+  width: 12px;
+  height: 14px;
+  margin-left: 15px;
+}
+
+.thong-tin-pam {
+  width: 161px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.plan .num {
+  color: #0080ff;
+  font-size: 12px;
+  margin-top: 10px;
+  padding-left: 10px;
+  width: 110%;
+}
+
+.thong-tin-plan {
+  display: flex;
+  height: fit-content;
+  margin-left: 15px;
+  margin-right: 15px;
+  padding: 10px;
+  flex-direction: row;
+  background-color: #d3d3d3;
+}
+
+.plan .ten-pam {
+  width: 94.5%;
+}
+
+.plan .ten-pam .num {
+  color: black;
+  font-weight: normal;
+}
+
+.progress-container .num {
+  margin: 0;
+  padding: 0;
+  padding-left: 5px;
+  margin-right: auto;
+}
+
+.progress-container {
+  width: 89%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 10px;
+  padding-left: 10px;
+}
+
+.progress-bar {
+  width: 12px;
+  height: 14px;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  padding-top: 100px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
+  border-radius: 5px;
+  height: max-content;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 200px;
+}
+
+span:hover {
+  cursor: pointer;
+  color: #0048ff;
+}
+
+.modal-edit {
+  width: 100%;
+  display: flex;
+}
+
+.modal-config {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-right: 10px;
+}
+
+.create-delete-modal {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  padding-top: 20px;
+}
+
+.create-modal {
+  margin-right: 10px;
+  background-color: #0080ff;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 3px;
+}
+
+.delete-modal {
+  margin-right: 10px;
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 3px;
+}
+
+.create-modal:hover {
+  background-color: #0048ff;
+  transition: ease-in 0.2s;
+}
+
+.create-modal,
+.delete-modal:hover {
+  cursor: pointer;
+}
+
+.delete-modal:hover {
+  background-color: #841d1d;
+  transition: ease-in 0.2s;
+}
+
+.pam-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 5px;
+}
+
+.pam-form label {
+  padding-top: 5px;
+  padding-bottom: 2px;
+}
+
+.danh-sach-pams .hang-hoa {
+  width: 1462px;
+  display: flex;
+  height: fit-content;
+  margin-left: 15px;
+  margin-right: 15px;
+  padding: 10px;
+  flex-direction: row;
+  background-color: white;
+  border-bottom: 1px solid #e5e4e2;
+}
+
+.danh-sach-pams .hang-hoa .loai {
+  width: 100%;
+  font-weight: normal;
+  font-size: 12px;
+}
+
+.edit {
+  position: relative;
+}
+
+.multiply-modal, .edit-modal:hover {
+  cursor: pointer;
+}
+
+.edit-modal {
+  background-color: rgb(15, 182, 15);
+  color: white;
+  border: none;
+  border-radius: 3px;
+  display: none;
+  margin-right: 10px;
+}
+
+box-icon:hover {
+  cursor: pointer;
+}
+
+.pagination-controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-left: 500px;
+  margin-right: 500px;
+  padding: 10px;
+}
+
+.page-btns {
+  margin: 2px;
+}
+
+.thong-bao-loi {
+  margin-top: 3px;
+  font-size: 12px;
+  color: red;
+  display: none;
+}
+
+.pam-form label {
+  font-weight: bold;
+  font-size: 15px;
+  margin-bottom: 5px;
 }
