@@ -72,3 +72,4 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 # quan-li-pam-react
 # quan-li-pamh-react
 # quan-li-pamh-react
+# quan-li-pamh-react
