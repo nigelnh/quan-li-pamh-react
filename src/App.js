@@ -20,17 +20,21 @@ function App() {
 
   // limit items in one page
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  let [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     const modal = document.getElementById("myModal");
     const createModal = document.getElementsByClassName("create-modal")[0];
     const deleteModal = document.getElementsByClassName("delete-modal")[0];
     const editModal = document.getElementsByClassName("edit-modal")[0];
-    const multiplyModal =
-      document.getElementsByClassName("multiply-modal")[[0]];
+    const multiplyModal = document.getElementsByClassName("multiply-modal")[0];
     const modalBtn = document.getElementsByClassName("tao-pam")[0];
     const errors = document.getElementsByClassName("thong-bao-loi");
+    const trangIcon = document.querySelector(".trang-icon");
+    const pamDisplay = document.querySelectorAll(".trang");
+    const totalPamsElement = document.querySelector(".total-pam");
+    const pageNum = document.querySelector(".so-trang-icon");
+    const numPages = document.querySelectorAll(".page-num");
 
     const openModal = () => {
       clearData();
@@ -47,24 +51,40 @@ function App() {
         multiplyModal.style.display = "block";
         modal.style.display = "none";
         Array.from(errors).forEach((error) => (error.style.display = "none"));
+
         setIsEditing(false);
         setCurrentPamIndex(null);
+      }
+
+      const isAnyTrangVisible = Array.from(pamDisplay).some(
+        (trang) => trang.style.display === "block"
+      );
+
+      const isAnyPageVisible = Array.from(numPages).some(
+        (page) => page.style.display === "block"
+      );
+
+      if (!trangIcon.contains(event.target) && isAnyTrangVisible) {
+        pamDisplay.forEach((trang) => {
+          trang.style.display = "none";
+        });
+      }
+
+      if (!pageNum.contains(event.target) && isAnyPageVisible) {
+        numPages.forEach((page) => {
+          page.style.display = "none";
+        });
       }
     };
 
     const createPam = () => {
       if (!validateForm()) return;
 
-      // if (isEditing) {
-      //   const updatedPams = pams.map((pam, index) =>
-      //     index === currentPamIndex ? formData : pam
-      //   );
-      //   setPams(updatedPams);
-      //   setIsEditing(false);
-      //   setCurrentPamIndex(null);
-      // } else {
-      setPams((prevPams) => [...prevPams, formData]);
-      // }
+      setPams((prevPams) => {
+        const newPams = [...prevPams, formData];
+        totalPamsElement.textContent = newPams.length;
+        return newPams;
+      });
 
       multiplyModal.style.display = "block";
       modal.style.display = "none";
@@ -92,6 +112,7 @@ function App() {
         const duplicatedPam = { ...pamToDuplicate };
 
         setPams((prevPams) => [...prevPams, duplicatedPam]);
+        totalPamsElement.textContent = duplicatedPam.length;
 
         createModal.style.display = "block";
         modal.style.display = "none";
@@ -113,12 +134,57 @@ function App() {
       modal.style.display = "none";
     };
 
+    const dropDownTrang = (event) => {
+      if (event.target === trangIcon || trangIcon.contains(event.target)) {
+        pamDisplay.forEach((trang) => {
+          trang.style.display =
+            trang.style.display === "block" ? "none" : "block";
+        });
+      } else {
+        pamDisplay.forEach((trang) => {
+          trang.style.display = "none";
+        });
+      }
+    };
+
+    const changeNumDropDown = (event) => {
+      const option1 = document.getElementsByClassName("trang")[0];
+      const option2 = document.getElementsByClassName("trang")[1];
+      let numPams = document.getElementsByClassName("num-pams")[0];
+
+      if (event.target === option1) {
+        setItemsPerPage(10);
+      } else if (event.target === option2) {
+        setItemsPerPage(20);
+      } else setItemsPerPage(30);
+
+      numPams.innerHTML = itemsPerPage;
+    };
+
+    const dropDownPage = (event) => {
+      if (event.target === pageNum || pageNum.contains(event.target)) {
+        numPages.forEach((page) => {
+          page.style.display =
+            page.style.display === "block" ? "none" : "block";
+        });
+      } else {
+        numPages.forEach((page) => {
+          page.style.display = "none";
+        });
+      }
+    };
+
     modalBtn.addEventListener("click", openModal);
     window.addEventListener("click", handleClickOutside);
     createModal.addEventListener("click", createPam);
     deleteModal.addEventListener("click", handleDeletePam);
     editModal.addEventListener("click", handleEditChange);
     multiplyModal.addEventListener("click", handleMultiplyModal);
+    trangIcon.addEventListener("click", dropDownTrang);
+    pamDisplay.forEach((trang) => {
+      trang.addEventListener("click", changeNumDropDown);
+    });
+    pageNum.addEventListener("click", dropDownPage);
 
     return () => {
       modalBtn.removeEventListener("click", openModal);
@@ -127,6 +193,11 @@ function App() {
       deleteModal.removeEventListener("click", handleDeletePam);
       editModal.removeEventListener("click", handleEditChange);
       multiplyModal.removeEventListener("click", handleMultiplyModal);
+      trangIcon.removeEventListener("click", dropDownTrang);
+      pamDisplay.forEach((trang) => {
+        trang.removeEventListener("click", changeNumDropDown);
+      });
+      pageNum.removeEventListener("click", dropDownPage);
     };
   }, [formData, isEditing, currentPamIndex, pams]);
 
@@ -270,25 +341,48 @@ function App() {
   );
 
   const totalPages = Math.ceil(pams.length / itemsPerPage);
+  useEffect(() => {
+    const next = document.querySelector(".sang-phai");
+    const prev = document.querySelector(".sang-trai");
+    let handleNextClick = () => handlePageChange(currentPage);
+    let handlePrevClick = () => handlePageChange(currentPage);
 
-  const renderPaginationControls = () => {
+    if (currentPage < totalPages && currentPage > 1) {
+      handleNextClick = () => handlePageChange(currentPage + 1);
+      handlePrevClick = () => handlePageChange(currentPage - 1);
+    } else if (currentPage < totalPages)
+      handleNextClick = () => handlePageChange(currentPage + 1);
+    else if (currentPage > 1)
+      handlePrevClick = () => handlePageChange(currentPage - 1);
+
+    next.addEventListener("click", handleNextClick);
+    prev.addEventListener("click", handlePrevClick);
+
+    // Cleanup function to remove event listeners
+    return () => {
+      next.removeEventListener("click", handleNextClick);
+      prev.removeEventListener("click", handlePrevClick);
+    };
+  }, [currentPage, totalPages]);
+
+  // pagination page
+  const paginationNumber = () => {
+    // Reset pages array to an empty array
     const pages = [];
+
+    // Generate page numbers
     for (let i = 1; i <= totalPages; i++) {
       pages.push(
-        <button
-          className="page-btns"
-          key={i}
-          onClick={() => handlePageChange(i)}
-          disabled={i === currentPage}
-        >
+        <div className="page-num" key={i} onClick={() => handlePageChange(i)}>
           {i}
-        </button>
+        </div>
       );
     }
 
     return <div className="pagination-controls">{pages}</div>;
   };
 
+  // clear data
   function clearData() {
     setFormData({
       maPam: "",
@@ -632,7 +726,7 @@ function App() {
           </div>
         </div>
       </div>
-      
+
       <div className="danh-sach-pams">
         {paginatedPams.map((pam, index) => (
           <div className="thong-tin-pam" key={index}>
@@ -657,7 +751,8 @@ function App() {
           </div>
         ))}
       </div>
-      {renderPaginationControls()}
+
+      {/* {renderPaginationControls()} */}
 
       <div id="myModal" className="modal">
         <div className="modal-content">
@@ -777,6 +872,48 @@ function App() {
           </div>
         </div>
       </div>
+
+      <div className="dieu-huong-container">
+        <div className="dieu-huong-trai">
+          <div className="so-luong-pam-hien">Số bản ghi mỗi trang:</div>
+          <div className="trang-dropdown">
+            <div className="trang-icon">
+              <div className="num-pams">{itemsPerPage}</div>
+              <box-icon name="chevron-down" color="black"></box-icon>
+            </div>
+            <div className="trang-container">
+              <div className="trang" value="10">
+                10
+              </div>
+              <div className="trang" value="20">
+                20
+              </div>
+              <div className="trang" value="30">
+                30
+              </div>
+            </div>
+          </div>
+          <div className="divider">|</div>
+          <div className="tong-so-pam">
+            {currentPage > 1 ? 1 + itemsPerPage : 1}-
+            {itemsPerPage * currentPage} của{" "}
+            <div className="total-pam">{pams.length}</div> bản ghi
+          </div>
+        </div>
+
+        <div className="dieu-huong-phai">
+          <div className="divider">|</div>
+          <div className="so-trang-icon">
+            <div className="so-trang">{currentPage}</div>
+            <box-icon name="chevron-down" color="black"></box-icon>
+          </div>
+          <div className="tong-so-trang">của {totalPages} trang</div>
+          <button className="sang-trai">{"<"}</button>
+          <button className="sang-phai">{">"}</button>
+        </div>
+      </div>
+
+      <div className="trang-list">{paginationNumber()}</div>
     </div>
   );
 }
