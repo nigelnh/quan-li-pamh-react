@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "boxicons";
 import "./App.css";
 
@@ -17,6 +18,20 @@ function App() {
     soLuongPhanHoi: "",
     trangThai: "",
   });
+  const hanghoacanmua = [
+    { item: "Bơ, phô mai", soLuong: "10,000 cái" },
+    { item: "Thực phẩm khô, gia vị", soLuong: "10,000 cái" },
+    { item: "Bàn đá, bàn gang", soLuong: "10,000 cái" },
+    { item: "Gương kính", soLuong: "10,000 cái" },
+    { item: "Thiết bị cân", soLuong: "10,000 cái" },
+  ];
+  const deNghiMua = [
+    { maDNMS: "PR.2023.0000010", donVi: "GGG-NH Gogi Tô Hiệu" },
+    { maDNMS: "PR.2023.0000009", donVi: "GGG-NH Gogi Nguyễn Chí Thanh" },
+    { maDNMS: "PR.2023.0000008", donVi: "GGG-NH Sumo Nguyễn Phong Sắc" },
+    { maDNMS: "PR.2023.0000007", donVi: "GGG-NH Sumo Nguyễn Thị Đình" },
+    { maDNMS: "PR.2023.0000006", donVi: "GGG-Phòng kế hoạch và phát triển" },
+  ];
 
   // limit items in one page
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,27 +50,29 @@ function App() {
     const totalPamsElement = document.querySelector(".total-pam");
     const pageNum = document.querySelector(".so-trang-icon");
     const numPages = document.querySelectorAll(".page-num");
+    const closeModal = document.querySelector(".close-pam-form");
 
     const openModal = () => {
       clearData();
+      createModal.style.display = "block";
       deleteModal.style.display = "none";
       editModal.style.display = "none";
       multiplyModal.style.display = "none";
       modal.style.display = "block";
     };
 
-    const handleClickOutside = (event) => {
-      if (event.target === modal) {
-        deleteModal.style.display = "block";
-        createModal.style.display = "block";
-        multiplyModal.style.display = "block";
-        modal.style.display = "none";
-        Array.from(errors).forEach((error) => (error.style.display = "none"));
+    const closeBtnModal = () => {
+      modal.style.display = "none";
+      deleteModal.style.display = "block";
+      multiplyModal.style.display = "block";
+      modal.style.display = "none";
+      Array.from(errors).forEach((error) => (error.style.display = "none"));
 
-        setIsEditing(false);
-        setCurrentPamIndex(null);
-      }
+      setIsEditing(false);
+      setCurrentPamIndex(null);
+    };
 
+    const pagesVisibility = (event) => {
       const isAnyTrangVisible = Array.from(pamDisplay).some(
         (trang) => trang.style.display === "block"
       );
@@ -78,7 +95,9 @@ function App() {
     };
 
     const createPam = () => {
-      if (!validateForm()) return;
+      if (!isPamValid()) {
+        return;
+      }
 
       setPams((prevPams) => {
         const newPams = [...prevPams, formData];
@@ -105,23 +124,20 @@ function App() {
     };
 
     const handleMultiplyModal = () => {
-      if (!validateForm()) return;
-
       if (isEditing && currentPamIndex !== null) {
         const pamToDuplicate = pams[currentPamIndex];
         const duplicatedPam = { ...pamToDuplicate };
 
-        setPams((prevPams) => [...prevPams, duplicatedPam]);
-        totalPamsElement.textContent = duplicatedPam.length;
-
-        createModal.style.display = "block";
+        setPams((prevPams) => {
+          const newPams = [...prevPams, duplicatedPam];
+          createModal.style.display = "block";
         modal.style.display = "none";
+        return newPams;
+        });
       }
     };
 
     const handleEditChange = () => {
-      if (!validateForm()) return;
-
       if (isEditing) {
         const updatedPams = pams.map((pam, index) =>
           index === currentPamIndex ? formData : pam
@@ -158,6 +174,7 @@ function App() {
         setItemsPerPage(20);
       } else setItemsPerPage(30);
 
+      paginationNumber();
       numPams.innerHTML = itemsPerPage;
     };
 
@@ -175,7 +192,7 @@ function App() {
     };
 
     modalBtn.addEventListener("click", openModal);
-    window.addEventListener("click", handleClickOutside);
+    window.addEventListener("click", pagesVisibility);
     createModal.addEventListener("click", createPam);
     deleteModal.addEventListener("click", handleDeletePam);
     editModal.addEventListener("click", handleEditChange);
@@ -185,10 +202,11 @@ function App() {
       trang.addEventListener("click", changeNumDropDown);
     });
     pageNum.addEventListener("click", dropDownPage);
+    closeModal.addEventListener("click", closeBtnModal);
 
     return () => {
       modalBtn.removeEventListener("click", openModal);
-      window.removeEventListener("click", handleClickOutside);
+      window.removeEventListener("click", pagesVisibility);
       createModal.removeEventListener("click", createPam);
       deleteModal.removeEventListener("click", handleDeletePam);
       editModal.removeEventListener("click", handleEditChange);
@@ -198,9 +216,11 @@ function App() {
         trang.removeEventListener("click", changeNumDropDown);
       });
       pageNum.removeEventListener("click", dropDownPage);
+      closeModal.removeEventListener("click", closeBtnModal);
     };
   }, [formData, isEditing, currentPamIndex, pams]);
 
+  // pam form configuration
   const handleInputChange = (event) => {
     const { id, value } = event.target;
     setFormData((prevFormData) => ({
@@ -225,10 +245,6 @@ function App() {
     modal.style.display = "block";
   };
 
-  const isMaPamValid = (maPam) => {
-    return maPam.includes(".") && !maPam.includes(" ");
-  };
-
   const isValidDateFormat = (date) => {
     const [day, month, year] = date.split("-");
     if (!day || !month || !year || year.length < 4) return false;
@@ -243,91 +259,36 @@ function App() {
     return true;
   };
 
-  const validateForm = () => {
+  const isPamValid = () => {
+    const inputs = document.querySelectorAll(".pam-form input");
     let isValid = true;
 
-    if (!isMaPamValid(formData.maPam)) {
-      isValid = false;
-      document.getElementsByClassName("thong-bao-loi")[0].style.display =
-        "block";
-    } else {
-      document.getElementsByClassName("thong-bao-loi")[0].style.display =
-        "none";
-    }
+    inputs.forEach((input, index) => {
+      const errorDiv = document.getElementsByClassName("thong-bao-loi")[index];
+      const inputName = input.getAttribute("id");
+      const inputValue = input.value.trim();
 
-    if (formData.tenPam === "") {
-      isValid = false;
-      document.getElementsByClassName("thong-bao-loi")[1].style.display =
-        "block";
-    } else {
-      document.getElementsByClassName("thong-bao-loi")[1].style.display =
-        "none";
-    }
+      // Check if input is empty
+      if (inputValue === "") {
+        errorDiv.style.display = "block";
+        isValid = false;
+      } else {
+        // Check date format for specific inputs
+        if (
+          (inputName === "ngayTao" ||
+            inputName === "ngayKetThucBaoGia" ||
+            inputName === "ngayBatDauBaoGia") &&
+          !isValidDateFormat(inputValue)
+        ) {
+          errorDiv.style.display = "block";
+          isValid = false;
+        } else {
+          errorDiv.style.display = "none";
+        }
+      }
+    });
 
-    if (formData.nguoiTao === "") {
-      isValid = false;
-      document.getElementsByClassName("thong-bao-loi")[2].style.display =
-        "block";
-    } else {
-      document.getElementsByClassName("thong-bao-loi")[2].style.display =
-        "none";
-    }
-
-    if (!isValidDateFormat(formData.ngayTao)) {
-      isValid = false;
-      document.getElementsByClassName("thong-bao-loi")[3].style.display =
-        "block";
-    } else {
-      document.getElementsByClassName("thong-bao-loi")[3].style.display =
-        "none";
-    }
-
-    if (formData.loaiSuKien === "") {
-      isValid = false;
-      document.getElementsByClassName("thong-bao-loi")[4].style.display =
-        "block";
-    } else {
-      document.getElementsByClassName("thong-bao-loi")[4].style.display =
-        "none";
-    }
-
-    if (!isValidDateFormat(formData.ngayBatDauBaoGia)) {
-      isValid = false;
-      document.getElementsByClassName("thong-bao-loi")[5].style.display =
-        "block";
-    } else {
-      document.getElementsByClassName("thong-bao-loi")[5].style.display =
-        "none";
-    }
-
-    if (!isValidDateFormat(formData.ngayKetThucBaoGia)) {
-      isValid = false;
-      document.getElementsByClassName("thong-bao-loi")[6].style.display =
-        "block";
-    } else {
-      document.getElementsByClassName("thong-bao-loi")[6].style.display =
-        "none";
-    }
-
-    if (formData.soLuongPhanHoi === "") {
-      isValid = false;
-      document.getElementsByClassName("thong-bao-loi")[7].style.display =
-        "block";
-    } else {
-      document.getElementsByClassName("thong-bao-loi")[7].style.display =
-        "none";
-    }
-
-    if (formData.trangThai === "") {
-      isValid = false;
-      document.getElementsByClassName("thong-bao-loi")[8].style.display =
-        "block";
-    } else {
-      document.getElementsByClassName("thong-bao-loi")[8].style.display =
-        "none";
-    }
-
-    return isValid ? true : false;
+    return isValid;
   };
 
   // Pagination
@@ -340,7 +301,7 @@ function App() {
     currentPage * itemsPerPage
   );
 
-  const totalPages = Math.ceil(pams.length / itemsPerPage);
+  let totalPages = Math.ceil(pams.length / itemsPerPage);
   useEffect(() => {
     const next = document.querySelector(".sang-phai");
     const prev = document.querySelector(".sang-trai");
@@ -409,10 +370,10 @@ function App() {
           <box-icon name="chevron-down" color="#A9A9A9"></box-icon>
         </div>
         <div className="nav">Đề nghị mua</div>
-        <div className="nav">
+        <Link to="/pam" className="nav nav-link">
           <div>Phương án mua</div>
           <box-icon name="chevron-down" color="#A9A9A9"></box-icon>
-        </div>
+        </Link>
         <div className="nav">
           <div>Đơn hàng</div>
           <box-icon name="chevron-down" color="#A9A9A9"></box-icon>
@@ -445,150 +406,66 @@ function App() {
             Lựa chọn các hàng hoá đang có nhu cầu để mua tập trung
           </div>
           <input type="text" placeholder="Tìm kiếm" />
-          <div className="thong-tin">
-            <div className="loai-hang-hoa">
-              <div className="hang-hoa">
-                <img
-                  className="to-do"
-                  src="images/square--outline.svg"
-                  alt=""
-                />
-                <div className="loai">Vật tư, hàng hoá</div>
-              </div>
-              <div className="hang-hoa">
-                <img
-                  className="to-do"
-                  src="images/square--outline.svg"
-                  alt=""
-                />
-                <div>Bơ, phô mai</div>
-              </div>
-              <div className="hang-hoa">
-                <img
-                  className="to-do"
-                  src="images/square--outline.svg"
-                  alt=""
-                />
-                <div>Thực phẩm khô, gia vị</div>
-              </div>
-              <div className="hang-hoa">
-                <img
-                  className="to-do"
-                  src="images/square--outline.svg"
-                  alt=""
-                />
-                <div>Bàn đá, bàn gang</div>
-              </div>
-              <div className="hang-hoa">
-                <img
-                  className="to-do"
-                  src="images/square--outline.svg"
-                  alt=""
-                />
-                <div>Gương kính</div>
-              </div>
-              <div className="hang-hoa">
-                <img
-                  className="to-do"
-                  src="images/square--outline.svg"
-                  alt=""
-                />
-                <div>Thiết bị cân</div>
-              </div>
-            </div>
-            <div className="so-luong">
-              <div className="hang-hoa">
-                <div className="loai">Số lượng cần mua</div>
-              </div>
-              <div className="hang-hoa">
-                <div>10,000 cái</div>
-              </div>
-              <div className="hang-hoa">
-                <div>10,000 cái</div>
-              </div>
-              <div className="hang-hoa">
-                <div>10,000 cái</div>
-              </div>
-              <div className="hang-hoa">
-                <div>10,000 cái</div>
-              </div>
-              <div className="hang-hoa">
-                <div>10,000 cái</div>
-              </div>
-            </div>
-          </div>
+          <table className="bang-pam">
+            <thead>
+              <tr>
+                <th className="vat-tu-hang-hoa">
+                  <div className="hang-hoa">
+                    <img
+                      className="to-do"
+                      src="images/square--outline.svg"
+                      alt=""
+                    />
+                    Vật tư, hàng hoá
+                  </div>
+                </th>
+                <th className="so-luong">Số lượng cần mua</th>
+              </tr>
+            </thead>
+            <tbody>
+              {hanghoacanmua.map((item, index) => (
+                <tr className="list" key={index}>
+                  <td className="loai-hang-hoa">
+                    <img
+                      className="to-do"
+                      src="images/square--outline.svg"
+                      alt=""
+                    />
+                    {item.item}
+                  </td>
+                  <td className="so-luong">{item.soLuong}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
         <div className="de-nghi-mua">
           <div className="tua-de">Đề nghị mua</div>
           <div className="tua-de-des">Tạo PAM cho 1 đề nghị</div>
           <input type="text" placeholder="Tìm kiếm" />
-          <div className="thong-tin">
-            <div className="loai-hang-hoa">
-              <div className="hang-hoa">
-                <div className="loai">Mã ĐNMS</div>
-              </div>
-              <div className="hang-hoa">
-                <div className="num">PR.2023.0000010</div>
-              </div>
-              <div className="hang-hoa">
-                <div className="num">PR.2023.0000009</div>
-              </div>
-              <div className="hang-hoa">
-                <div className="num">PR.2023.0000008</div>
-              </div>
-              <div className="hang-hoa">
-                <div className="num">PR.2023.0000008</div>
-              </div>
-              <div className="hang-hoa">
-                <div className="num">PR.2023.0000008</div>
-              </div>
-            </div>
-            <div className="so-luong">
-              <div className="hang-hoa">
-                <div className="loai">Đơn vị</div>
-              </div>
-              <div className="hang-hoa">
-                <div>GGG-NH Tô Hiệu</div>
-                <img
-                  className="doc-add"
-                  src="images/document--add.svg"
-                  alt=""
-                />
-              </div>
-              <div className="hang-hoa">
-                <div>GGG-NH Tô Hiệu</div>
-                <img
-                  className="doc-add"
-                  src="images/document--add.svg"
-                  alt=""
-                />
-              </div>
-              <div className="hang-hoa">
-                <div>GGG-NH Tô Hiệu</div>
-                <img
-                  className="doc-add"
-                  src="images/document--add.svg"
-                  alt=""
-                />
-              </div>
-              <div className="hang-hoa">
-                <div>GGG-NH Tô Hiệu</div>
-                <img
-                  className="doc-add"
-                  src="images/document--add.svg"
-                  alt=""
-                />
-              </div>
-              <div className="hang-hoa">
-                <div>GGG-NH Tô Hiệu</div>
-                <img
-                  className="doc-add"
-                  src="images/document--add.svg"
-                  alt=""
-                />
-              </div>
-            </div>
-          </div>
+          <table className="bang-pam">
+            <thead>
+              <tr>
+                <th className="vat-tu-hang-hoa">
+                  <div className="hang-hoa">Mã ĐNMS</div>
+                </th>
+                <th className="so-luong">Đơn vị</th>
+              </tr>
+            </thead>
+            <tbody>
+              {deNghiMua.map((item, index) => (
+                <tr key={index}>
+                  <td className="loai-hang-hoa">{item.maDNMS}</td>
+                  <td className="so-luong">{item.donVi}</td>
+                  <img
+                    className="doc-add"
+                    src="images/document--add.svg"
+                    alt=""
+                  />
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -617,148 +494,55 @@ function App() {
         </div>
       </div>
 
-      <div className="thong-tin-plan">
-        <div className="thong-tin-pam">
-          <div className="ma-pam">
-            <div className="so-pam-title">
-              <div className="loai-pam">Mã PAM #</div>
-            </div>
-          </div>
-        </div>
-        <div className="thong-tin-pam">
-          <div className="ten-pam">
-            <div className="so-pam-title">
-              <div className="loai-pam">Tên PAM</div>
-            </div>
-          </div>
-        </div>
-        <div className="thong-tin-pam">
-          <div className="ten-pam">
-            <div className="so-pam-title">
-              <div className="loai-pam">Người tạo</div>
-            </div>
-          </div>
-        </div>
-        <div className="thong-tin-pam">
-          <div className="ten-pam">
-            <div className="so-pam-title">
-              <div className="loai-pam">Ngày tạo</div>
-            </div>
-          </div>
-        </div>
-        <div className="thong-tin-pam">
-          <div className="ten-pam">
-            <div className="so-pam-title">
-              <div className="loai-pam">Loại sự kiện</div>
-            </div>
-          </div>
-        </div>
-        <div className="thong-tin-pam">
-          <div className="ten-pam">
-            <div className="so-pam-title">
-              <div className="loai-pam">Ngày bắt đầu báo giá</div>
-            </div>
-          </div>
-        </div>
-        <div className="thong-tin-pam">
-          <div className="ten-pam">
-            <div className="so-pam-title">
-              <div className="loai-pam">Ngày kết thúc báo giá</div>
-            </div>
-          </div>
-        </div>
-        <div className="thong-tin-pam">
-          <div className="ten-pam">
-            <div className="so-pam-title">
-              <div className="loai-pam">Số lượng phản hồi</div>
-            </div>
-          </div>
-        </div>
-        <div className="thong-tin-pam">
-          <div className="ten-pam">
-            <div className="so-pam-title">
-              <div className="loai-pam">Trạng thái</div>
-            </div>
-            {/* <div className="so-pam">
-                 <div className="progress-container">
-                   <img
-                     className="progress-bar"
-                     src="/images/queued.svg"
-                     alt=""
-                   />
-                   <div className="num">Mới tạo</div>
-                   <box-icon name="dots-vertical-rounded" size="xs"></box-icon>
-                 </div>
-               </div> */}
-            {/* <div className="so-pam">
-                 <div className="progress-container">
-                   <img
-                     className="progress-bar"
-                     src="/images/in-progress.svg"
-                     alt=""
-                   />
-                   <div className="num">Chờ duyệt sự liện</div>
-                   <box-icon name="dots-vertical-rounded" size="xs"></box-icon>
-                 </div>
-               </div>
-               <div className="so-pam">
-                 <div className="progress-container">
-                   <img
-                     className="progress-bar"
-                     src="/images/condition--wait-point.svg"
-                     alt=""
-                   />
-                   <div className="num">Chờ diễn ra</div>
-                   <box-icon name="dots-vertical-rounded" size="xs"></box-icon>
-                 </div>
-               </div>
-               <div className="so-pam">
-                 <div className="progress-container">
-                   <img
-                     className="progress-bar"
-                     src="/images/error--outline.svg"
-                     alt=""
-                   />
-                   <div className="num">Đã huỷ</div>
-                   <box-icon name="dots-vertical-rounded" size="xs"></box-icon>
-                 </div>
-               </div> */}
-          </div>
-        </div>
-      </div>
-
-      <div className="danh-sach-pams">
-        {paginatedPams.map((pam, index) => (
-          <div className="thong-tin-pam" key={index}>
-            <div className="hang-hoa">
-              <div className="loai">{pam.maPam}</div>
-              <div className="loai">{pam.tenPam}</div>
-              <div className="loai">{pam.nguoiTao}</div>
-              <div className="loai">{pam.ngayTao}</div>
-              <div className="loai">{pam.loaiSuKien}</div>
-              <div className="loai">{pam.ngayBatDauBaoGia}</div>
-              <div className="loai">{pam.ngayKetThucBaoGia}</div>
-              <div className="loai">{pam.soLuongPhanHoi}</div>
-              <div className="loai">{pam.trangThai}</div>
-              <div className="edit">
+      <table className="bang-pam">
+        <thead>
+          <tr className="thong-tin-loai-pam">
+            <th className="loai-pam">Mã PAM #</th>
+            <th className="loai-pam">Tên PAM</th>
+            <th className="loai-pam">Người tạo</th>
+            <th className="loai-pam">Ngày tạo</th>
+            <th className="loai-pam">Loại sự kiện</th>
+            <th className="loai-pam">Ngày bắt đầu báo giá</th>
+            <th className="loai-pam">Ngày kết thúc báo giá</th>
+            <th className="loai-pam">Số lượng phản hồi</th>
+            <th className="loai-pam">Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody>
+          {paginatedPams.map((pam, index) => (
+            <tr className="thong-tin-pam" key={index}>
+              <td className="loai">{pam.maPam}</td>
+              <td className="loai">{pam.tenPam}</td>
+              <td className="loai">{pam.nguoiTao}</td>
+              <td className="loai">{pam.ngayTao}</td>
+              <td className="loai">{pam.loaiSuKien}</td>
+              <td className="loai">{pam.ngayBatDauBaoGia}</td>
+              <td className="loai">{pam.ngayKetThucBaoGia}</td>
+              <td className="loai">{pam.soLuongPhanHoi}</td>
+              <td className="loai">{pam.trangThai}</td>
+              <td className="edit">
                 <box-icon
                   onClick={() => handleEditClick(index)}
                   name="dots-vertical-rounded"
                   size="xs"
                 ></box-icon>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* {renderPaginationControls()} */}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
       <div id="myModal" className="modal">
         <div className="modal-content">
+          <img className="close-pam-form" src="images/close.svg" alt="" />
           <form className="pam-form">
             <label htmlFor="maPam">Mã PAM:</label>
             <input
+              onClick={() => {
+                document.getElementsByClassName(
+                  "thong-bao-loi"
+                )[0].style.display = "none";
+              }}
               type="text"
               id="maPam"
               value={formData.maPam}
@@ -771,6 +555,11 @@ function App() {
 
             <label htmlFor="tenPam">Tên PAM:</label>
             <input
+              onClick={() => {
+                document.getElementsByClassName(
+                  "thong-bao-loi"
+                )[1].style.display = "none";
+              }}
               type="text"
               id="tenPam"
               value={formData.tenPam}
@@ -781,6 +570,11 @@ function App() {
 
             <label htmlFor="nguoiTao">Người tạo:</label>
             <input
+              onClick={() => {
+                document.getElementsByClassName(
+                  "thong-bao-loi"
+                )[2].style.display = "none";
+              }}
               type="text"
               id="nguoiTao"
               value={formData.nguoiTao}
@@ -793,6 +587,11 @@ function App() {
 
             <label htmlFor="ngayTao">Ngày tạo:</label>
             <input
+              onClick={() => {
+                document.getElementsByClassName(
+                  "thong-bao-loi"
+                )[3].style.display = "none";
+              }}
               type="text"
               id="ngayTao"
               value={formData.ngayTao}
@@ -805,6 +604,11 @@ function App() {
 
             <label htmlFor="loaiSuKien">Loại sự kiện:</label>
             <input
+              onClick={() => {
+                document.getElementsByClassName(
+                  "thong-bao-loi"
+                )[4].style.display = "none";
+              }}
               type="text"
               id="loaiSuKien"
               value={formData.loaiSuKien}
@@ -817,6 +621,11 @@ function App() {
 
             <label htmlFor="ngayBatDauBaoGia">Ngày bắt đầu báo giá:</label>
             <input
+              onClick={() => {
+                document.getElementsByClassName(
+                  "thong-bao-loi"
+                )[5].style.display = "none";
+              }}
               type="text"
               id="ngayBatDauBaoGia"
               value={formData.ngayBatDauBaoGia}
@@ -829,6 +638,11 @@ function App() {
 
             <label htmlFor="ngayKetThucBaoGia">Ngày kết thúc báo giá:</label>
             <input
+              onClick={() => {
+                document.getElementsByClassName(
+                  "thong-bao-loi"
+                )[6].style.display = "none";
+              }}
               type="text"
               id="ngayKetThucBaoGia"
               value={formData.ngayKetThucBaoGia}
@@ -841,6 +655,11 @@ function App() {
 
             <label htmlFor="soLuongPhanHoi">Số lượng phản hồi:</label>
             <input
+              onClick={() => {
+                document.getElementsByClassName(
+                  "thong-bao-loi"
+                )[7].style.display = "none";
+              }}
               type="text"
               id="soLuongPhanHoi"
               value={formData.soLuongPhanHoi}
@@ -853,6 +672,11 @@ function App() {
 
             <label htmlFor="trangThai">Trạng thái:</label>
             <input
+              onClick={() => {
+                document.getElementsByClassName(
+                  "thong-bao-loi"
+                )[8].style.display = "none";
+              }}
               type="text"
               id="trangThai"
               value={formData.trangThai}
@@ -896,7 +720,7 @@ function App() {
           <div className="divider">|</div>
           <div className="tong-so-pam">
             {currentPage > 1 ? 1 + itemsPerPage : 1}-
-            {itemsPerPage * currentPage} của{" "}
+            {itemsPerPage * currentPage} của
             <div className="total-pam">{pams.length}</div> bản ghi
           </div>
         </div>
@@ -914,6 +738,9 @@ function App() {
       </div>
 
       <div className="trang-list">{paginationNumber()}</div>
+      {/* <table>
+        <thead></thead>
+      </table> */}
     </div>
   );
 }

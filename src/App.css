@@ -51,11 +51,19 @@ body {
   margin-left: 25px;
   align-items: center;
   height: 48px;
+  text-decoration: none;
 }
 
 .thanh-trang-thai .nav:hover {
   cursor: pointer;
   border-bottom: 3px solid #0080ff;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
 }
 
 .tong-quan-container {
@@ -97,23 +105,17 @@ body {
 
 .container .hang-hoa-can-mua {
   background-color: white;
-  width: 935px;
+  width: 60%;
   padding-top: 10px;
   padding-bottom: 10px;
   height: 214px;
 }
 
-.container .to-do {
-  width: 12px;
-  height: 14px;
-  margin-right: 10px;
-}
-
 .container .de-nghi-mua {
   background-color: white;
-  margin-left: auto;
-  width: 525px;
-  height: 213px;
+  width: 100%;
+  margin-left: 2px;
+  height: 214px;
   padding: 10px;
 }
 
@@ -130,66 +132,25 @@ body {
   margin-left: 10px;
 }
 
-.container .hang-hoa-can-mua input {
-  width: 895px;
+.container input {
+  width: 94%;
   padding: 10px;
   border: none;
   background-color: #e5e4e2;
   margin-left: 10px;
-  margin-right: 10px;
 }
 
-.container .de-nghi-mua input {
-  width: 505px;
-  padding: 10px;
-  border: none;
-  background-color: #e5e4e2;
-  margin-right: 10px;
-}
-
-.container .thong-tin {
-  display: flex;
-}
-
-.container .loai-hang-hoa {
-  width: 580px;
-}
-
-.container .hang-hoa {
-  width: auto;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-  font-size: 12px;
-  margin-bottom: 6px;
-  margin-top: 6px;
-  padding-left: 10px;
-  padding-bottom: 2px;
-
-  border-bottom: 1px solid #e5e4e2;
-}
-
-.container .doc-add {
-  margin-left: auto;
-  width: 12px;
-  height: 14px;
-}
-
-.loai {
-  font-weight: bold;
-}
-
-.container .vat-tu-hang-hoa {
+.container {
   margin-left: 10px;
 }
 
 .container .so-luong {
-  width: 500px;
+  width: 50%;
+  text-align: start;
 }
 
-.container .de-nghi-mua .loai-hang-hoa {
-  width: 250px;
+.container .de-nghi-mua {
+  width: 40%;
 }
 
 .container .num {
@@ -277,11 +238,11 @@ body {
   margin-left: 15px;
 }
 
-.thong-tin-pam {
+/* .thong-tin-pam {
   width: 161px;
   font-size: 12px;
   font-weight: bold;
-}
+} */
 
 .plan .num {
   color: #0080ff;
@@ -442,14 +403,10 @@ span:hover {
   border-bottom: 1px solid #e5e4e2;
 }
 
-.danh-sach-pams .hang-hoa .loai {
+.danh-sach-pams .hang-hoa {
   width: 100%;
   font-weight: normal;
   font-size: 12px;
-}
-
-.edit {
-  position: relative;
 }
 
 .multiply-modal,
@@ -621,4 +578,90 @@ box-icon:hover {
   margin-left: auto;
   flex-direction: column;
   justify-content: center;
+}
+
+.close-pam-form {
+  background-color: red;
+  border: 1px solid black;
+  border-radius: 2px;
+  width: 25px;
+  margin-left: auto;
+}
+
+.close-pam-form:hover {
+  background-color: rgb(183, 32, 32);
+  transition: ease-in 0.2s;
+  cursor: pointer;
+}
+
+.bang-pam {
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+  border-spacing: 0;
+  font-size: 12px;
+}
+
+.thong-tin-loai-pam {
+  font-size: 11px;
+}
+
+.loai-pam {
+  background-color: #a9a9a9;
+  text-align: left;
+  padding: 10px;
+}
+
+.thong-tin-pam {
+  padding-left: 15px;
+  padding-right: 15px;
+  border-spacing: 0;
+}
+
+.loai {
+  font-size: 11px;
+  padding: 10px;
+  background-color: white;
+  border-bottom: 1px solid #a9a9a9;
+}
+
+.edit {
+  position: absolute;
+  right: 20px;
+  padding-top: 8px;
+}
+
+.to-do {
+  width: 20px;
+  position: relative;
+  right: 8px;
+}
+
+.vat-tu-hang-hoa .hang-hoa {
+  display: flex;
+  align-items: center;
+}
+
+.loai-hang-hoa {
+  display: flex;
+  align-items: center;
+}
+
+.so-luong {
+  width: 100%;
+  /* border-bottom: 1px solid #a9a9a9; */
+}
+
+.de-nghi-mua img {
+  width: 18px;
+  position: relative;
+  left: 30px;
+}
+
+.de-nghi-mua .hang-hoa {
+  margin-top: 4px;
+}
+
+.de-nghi-mua .loai-hang-hoa {
+  color: #0048ff;
 }
